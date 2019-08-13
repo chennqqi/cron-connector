@@ -10,9 +10,9 @@ import (
 	"os"
 	"time"
 
+	cfunction "github.com/chennqqi/cron-connector/types"
 	"github.com/openfaas-incubator/connector-sdk/types"
 	"github.com/openfaas/faas/gateway/requests"
-	cfunction "github.com/zeerorg/cron-connector/types"
 )
 
 func main() {

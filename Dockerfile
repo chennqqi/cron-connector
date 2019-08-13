@@ -1,6 +1,6 @@
 FROM golang:1.10.4 as builder
-RUN mkdir -p /go/src/github.com/zeerorg/cron-connector
-WORKDIR /go/src/github.com/zeerorg/cron-connector
+RUN mkdir -p /go/src/github.com/chennqqi/cron-connector
+WORKDIR /go/src/github.com/chennqqi/cron-connector
 
 COPY vendor       vendor
 COPY types        types
@@ -22,7 +22,7 @@ RUN addgroup -S app \
 
 WORKDIR /home/app
 
-COPY --from=builder /go/src/github.com/zeerorg/cron-connector/    .
+COPY --from=builder /go/src/github.com/chennqqi/cron-connector/    .
 
 RUN chown -R app:app ./
 
