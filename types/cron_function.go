@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/openfaas-incubator/connector-sdk/types"
 	"github.com/openfaas/faas/gateway/requests"
@@ -20,6 +21,7 @@ type CronFunction struct {
 	FuncData requests.Function
 	Name     string
 	Schedule string
+	Async    bool
 }
 
 // CronFunctions a list of CronFunction
@@ -46,6 +48,7 @@ func ToCronFunction(f requests.Function, topic string) (CronFunction, error) {
 	}
 	fTopic := (*f.Annotations)["topic"]
 	fSchedule := (*f.Annotations)["schedule"]
+	async := strings.ToLower((*f.Annotations)["async"]) == "true"
 
 	if fTopic != topic {
 		return CronFunction{}, errors.New(fmt.Sprint(f.Name, " has wrong topic: ", fTopic))
@@ -59,12 +62,16 @@ func ToCronFunction(f requests.Function, topic string) (CronFunction, error) {
 	c.FuncData = f
 	c.Name = f.Name
 	c.Schedule = fSchedule
+	c.Async = async
 	return c, nil
 }
 
 // InvokeFunction Invokes the cron function
 func (c CronFunction) InvokeFunction(i *types.Invoker) (*[]byte, error) {
 	gwURL := fmt.Sprintf("%s/function/%s", i.GatewayURL, c.Name)
+	if c.Async {
+		gwURL = fmt.Sprintf("%s/async-function/%s", i.GatewayURL, c.Name)
+	}
 	reader := bytes.NewReader(make([]byte, 0))
 	httpReq, _ := http.NewRequest(http.MethodPost, gwURL, reader)
 

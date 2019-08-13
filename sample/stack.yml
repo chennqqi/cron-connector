@@ -8,3 +8,10 @@ functions:
     annotations:
       topic: cron-function
       schedule: "* * * * *"
+  nodeinfo:
+    image: functions/nodeinfo:latest
+    annotations:
+      topic: cron-function
+      schedule: "* * * * *"
+	  # async call
+      async: true	
