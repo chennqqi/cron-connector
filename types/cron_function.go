@@ -18,10 +18,11 @@ import (
 
 // CronFunction depicts an OpenFaaS function which is invoked by cron
 type CronFunction struct {
-	FuncData requests.Function
-	Name     string
-	Schedule string
-	Async    bool
+	FuncData    requests.Function
+	Name        string
+	Schedule    string
+	Async       bool
+	AppendixURI string
 }
 
 // CronFunctions a list of CronFunction
@@ -29,13 +30,10 @@ type CronFunctions []CronFunction
 
 // Contains returns true if the provided CronFunction object is in list
 func (c *CronFunctions) Contains(cF *CronFunction) bool {
-
 	for _, f := range *c {
-
 		if f.Name == cF.Name && f.Schedule == cF.Schedule {
 			return true
 		}
-
 	}
 
 	return false
@@ -48,6 +46,7 @@ func ToCronFunction(f requests.Function, topic string) (CronFunction, error) {
 	}
 	fTopic := (*f.Annotations)["topic"]
 	fSchedule := (*f.Annotations)["schedule"]
+	fAppendixURI := (*f.Annotations)["appendix_uri"]
 	async := strings.ToLower((*f.Annotations)["async"]) == "true"
 
 	if fTopic != topic {
@@ -63,6 +62,7 @@ func ToCronFunction(f requests.Function, topic string) (CronFunction, error) {
 	c.Name = f.Name
 	c.Schedule = fSchedule
 	c.Async = async
+	c.AppendixURI = fAppendixURI
 	return c, nil
 }
 
@@ -72,6 +72,7 @@ func (c CronFunction) InvokeFunction(i *types.Invoker) (*[]byte, error) {
 	if c.Async {
 		gwURL = fmt.Sprintf("%s/async-function/%s", i.GatewayURL, c.Name)
 	}
+	gwURL += c.AppendixURI
 	reader := bytes.NewReader(make([]byte, 0))
 	httpReq, _ := http.NewRequest(http.MethodPost, gwURL, reader)
 

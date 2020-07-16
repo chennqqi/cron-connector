@@ -8,10 +8,11 @@ functions:
     annotations:
       topic: cron-function
       schedule: "* * * * *"
-  nodeinfo:
+  nodeinfoA:
     image: functions/nodeinfo:latest
     annotations:
       topic: cron-function
       schedule: "* * * * *"
 	  # async call
       async: true	
+      appendix_uri: 'q=aaa&name=lucy'      
